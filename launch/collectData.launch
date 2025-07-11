@@ -1,0 +1,17 @@
+<launch>
+    <include file="$(find rm_driver)/launch/dataCollect.launch"/>
+
+    <arg name="datapath" default="/home/arm_hao/ros_yh/src/datacollect/data"/>
+    <arg name="exp_id" default="03"/>
+    
+    <node pkg="datacollect" type="arm_data_1.py" name="arm_data_collect" output="screen">
+        <param name="data_path" value="$(arg datapath)"/>
+        <param name="exp_id" value="$(arg exp_id)"/>
+    </node>
+
+    <node pkg="datacollect" type="camera.py" name="camera_data" output="screen">
+        <param name="data_path" value="$(arg datapath)"/>
+        <param name="exp_id" value="$(arg exp_id)"/>
+    </node>
+    <!-- <node pkg="datacollect" type="draft.py" name="draft_data" output="screen"/> -->
+</launch>
