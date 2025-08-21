@@ -1,0 +1,57 @@
+import sys
+import os
+import json
+import numpy as np
+import pandas as pd
+import cv2
+from typing import Dict, Any
+
+def main(origin_path: str, target_path: str, crouch_id: list):
+    '''
+    该函数用于往原始点位信息字典里添加任务点编号、下蹲标识
+
+    origin_path: 原始点位信息文件路径
+
+    target_path: 处理后点位信息文件路径
+
+    crouch_id: 需要下蹲的点位id列表
+
+    新增键值: mission_id, crouch (0: 不需要下蹲, 1: 需要下蹲)
+    '''
+    with open(origin_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+
+    count = 0
+
+    for idx, item in enumerate(data):
+        point_id = item.get('Value', 0)
+        if point_id == 0:
+            print('获取点位id失败')
+            continue
+
+        if point_id in crouch_id:
+            print(f'点位 {point_id} 需要下蹲')
+            item['crouch'] = 1
+        else:
+            item['crouch'] = 0
+        
+        if item.get('PointInfo', 0) == 1:
+            count += 1
+            item['mission_id'] = count
+        else:
+            item['mission_id'] = 0
+
+    with open(target_path, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=0, separators=(',', ': '))
+
+
+
+if __name__ == "__main__":
+    origin_path = '/home/fusionai/disk/codeup/ros_ws/src/test/robot_dog/nav_path/30f233b0_factory807.json'
+    target_path = '/home/fusionai/disk/codeup/ros_ws/src/test/robot_dog/nav_path/factory807_crouch.json'
+    target_dir = os.path.dirname(target_path)
+    os.makedirs(target_dir, exist_ok=True)
+    crouch_id = [11]
+    main(origin_path, target_path, crouch_id)
+
+
